@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Please select the topic", Toast.LENGTH_SHORT).show();
                 }
                 else{
-                    Intent intent = new Intent(MainActivity.this,QuizActivity.class);
+                    Intent intent = new Intent(getApplicationContext(),QuizActivity.class);
                     intent.putExtra("selectedTopic",selectedTopicName);
                     startActivity(intent);
                     finish();

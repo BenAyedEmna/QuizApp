@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import com.example.quiz.QuizContract.*;
 
@@ -26,7 +27,9 @@ public class QuizActivity extends AppCompatActivity {
 
     private ImageView backBtn ;
     private AppCompatButton quitBtn ;
-    private List<QuestionsList> questionsLists ;
+    private ArrayList<QuestionsList> questionsLists ;
+    private ArrayList<QuestionsList> questionsLists2 ;
+
     private int currentQuestionPosition = 0  ;
     private String selectedOptionByUser ="";
     private Cursor questionList;
@@ -35,19 +38,7 @@ public class QuizActivity extends AppCompatActivity {
     private QuestionsList currentQuestions;
     private boolean answered ;
 
-    private void fetchDB(){
-        DatabaseHelper dbHelper = new DatabaseHelper(this);
-        questionList = dbHelper.getAllQuestions();
-        int columnIndex = questionList.getColumnIndex(QuestionTable.COL_QUESTION);
-        if (questionList.moveToFirst()) {
-            do {
-                if (columnIndex != -1) {
-                    String question = questionList.getString(columnIndex);
-                }
-                System.out.println("Question: " + question);
-            } while (questionList.moveToNext());
-        }
-    }
+
 
 
     @Override
@@ -69,12 +60,16 @@ public class QuizActivity extends AppCompatActivity {
         nextBtn=findViewById(R.id.nextBtn);
         quitBtn=findViewById(R.id.quitBtn);
 
-        //fetchDB();
 
+        fetchDB();
         final String getSelectedTopicName = getIntent().getStringExtra("selectedTopic");
         selectedTopic.setText(getSelectedTopicName);
 
-        questionsLists = QuestionsBank.getQuestions(getSelectedTopicName);
+        /*currentQuestions = questionsLists.get(questionCounter);
+        questions.setText(currentQuestions.getQuestion());*/
+
+
+        questionsLists = (ArrayList<QuestionsList>) QuestionsBank.getQuestions(getSelectedTopicName);
         questions.setText((currentQuestionPosition+1)+"/"+questionsLists.size());
         question.setText(questionsLists.get(0).getQuestion());
         option1.setText(questionsLists.get(0).getOption1());
@@ -104,9 +99,7 @@ public class QuizActivity extends AppCompatActivity {
                     selectedOptionByUser = option2.getText().toString();
                     option2.setBackgroundResource(R.drawable.round_back_red);
                     option2.setTextColor(Color.WHITE);
-
                     revealAnswer();
-
                     questionsLists.get(currentQuestionPosition).setUserSelectedAnswer(selectedOptionByUser);
                 }
             }
@@ -119,9 +112,7 @@ public class QuizActivity extends AppCompatActivity {
                     selectedOptionByUser = option3.getText().toString();
                     option3.setBackgroundResource(R.drawable.round_back_red);
                     option3.setTextColor(Color.WHITE);
-
                     revealAnswer();
-
                     questionsLists.get(currentQuestionPosition).setUserSelectedAnswer(selectedOptionByUser);
                 }
             }
@@ -168,6 +159,56 @@ public class QuizActivity extends AppCompatActivity {
         });
     }
 
+    private void fetchDB(){
+        DatabaseHelper dbHelper = new DatabaseHelper(this);
+        questionsLists2 = dbHelper.getAllQuestions();
+
+
+
+        //changeNextQuestion();
+        /*int columnIndex = questionList.getColumnIndex(QuestionTable.COL_QUESTION);
+        if (questionList.moveToFirst()) {
+            do {
+                if (columnIndex != -1) {
+                    String question = questionList.getString(columnIndex);
+                }
+                System.out.println("Question: " + question);
+            } while (questionList.moveToNext());
+        }*/
+    }
+
+    /*public void startQuiz(){
+        questionTotalCount = questionsLists.size();
+        Collections.shuffle(questionsLists);
+
+        changeNextQuestion();
+
+        nextBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!answered){
+                    if(option1)
+                }
+            }
+        });
+    }*/
+
+   /* private void showQuestions(){
+
+        if(questionCounter<questionTotalCount){
+            currentQuestions = questionsLists.get(questionCounter);
+            questions.setText(currentQuestions.getQuestion());
+            option1.setText(currentQuestions.getOption1());
+            option2.setText(currentQuestions.getOption2());
+            option3.setText(currentQuestions.getOption3());
+            option4.setText(currentQuestions.getOption4());
+
+            questionCounter++;
+            answered = false;
+
+            nextBtn.setText("Confirm");
+        }
+    }*/
     private void changeNextQuestion(){
         currentQuestionPosition++;
         if((currentQuestionPosition+1)== questionsLists.size()){
@@ -195,7 +236,7 @@ public class QuizActivity extends AppCompatActivity {
             option4.setText(questionsLists.get(currentQuestionPosition).getOption4());
         }
         else{
-            Intent intent = new Intent(QuizActivity.this,QuizResults.class);
+            Intent intent = new Intent(getApplicationContext(),QuizResults .class);
             intent.putExtra("correct",getCorrectAnswers());
             intent.putExtra("incorrect",getInCorrectAnswers());
             startActivity(intent);
